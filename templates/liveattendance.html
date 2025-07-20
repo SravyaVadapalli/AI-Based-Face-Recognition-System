@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Attendance - Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 800px;
+            width: 100%;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .location-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .location-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .video-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        video {
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            max-width: 100%;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        #attendanceResult {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='/'">← Back</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>📹 Live Attendance Tracking</h1>
+            <p>Real-time Face Recognition</p>
+        </div>
+        
+        <!-- Location and Time Information -->
+        <div class="location-info">
+            <h3>📍 Location & Time Verification</h3>
+            <div id="locationStatus" class="status-indicator">
+                <div class="loading"></div>
+                Getting location and time...
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">📅 Current Date</div>
+                    <div class="info-value" id="currentDate">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">🕐 Current Time</div>
+                    <div class="info-value" id="currentTime">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">📍 Latitude</div>
+                    <div class="info-value" id="currentLat">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">📍 Longitude</div>
+                    <div class="info-value" id="currentLon">--</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">📏 Distance from College</div>
+                    <div class="info-value" id="distanceFromCollege">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-container">
+            <video id="attendanceVideo" width="480" height="360" autoplay></video>
+            <br><br>
+            <button type="button" class="btn" onclick="startAttendanceCamera()" id="startCameraBtn">Start Camera</button>
+            <button type="button" class="btn" onclick="markAttendance()" id="markAttendanceBtn" disabled>Mark Attendance</button>
+            <button type="button" class="btn btn-secondary" onclick="stopAttendanceCamera()">Stop Camera</button>
+            <canvas id="attendanceCanvas" width="480" height="360" style="display: none;"></canvas>
+        </div>
+        <div id="attendanceResult"></div>
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Back</button>
+    </div>
+
+    <script>
+        // Global variables
+        let attendanceVideo = null;
+        let currentLocation = null;
+        let locationAllowed = false;
+        let timeInterval = null;
+        const COLLEGE_LOCATION = {
+            latitude: 17.0894, 
+            longitude: 82.0668,
+            name: "College Campus",
+            maxDistance: 1000 // Maximum allowed distance in meters
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            startLocationTracking();
+        });
+
+        // Navigation functions
+        function goBack() {
+            stopLocationTracking();
+            window.history.back();
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Location and time tracking
+        function startLocationTracking() {
+            updateDateTime();
+            timeInterval = setInterval(updateDateTime, 1000);
+            getCurrentLocation();
+        }
+
+        function stopLocationTracking() {
+            if (timeInterval) {
+                clearInterval(timeInterval);
+                timeInterval = null;
+            }
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            };
+
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-IN', dateOptions);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-IN', timeOptions);
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        currentLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        
+                        document.getElementById('currentLat').textContent = currentLocation.latitude.toFixed(6);
+                        document.getElementById('currentLon').textContent = currentLocation.longitude.toFixed(6);
+                        
+                        checkLocationPermission();
+                    },
+                    error => {
+                        console.error('Geolocation error:', error);
+                        updateLocationStatus('❌ Location access denied. Attendance marking disabled.', 'denied');
+                        document.getElementById('currentLat').textContent = 'Access Denied';
+                        document.getElementById('currentLon').textContent = 'Access Denied';
+                        document.getElementById('distanceFromCollege').textContent = 'Unknown';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                updateLocationStatus('❌ Geolocation not supported. Attendance marking disabled.', 'denied');
+            }
+        }
+
+        function checkLocationPermission() {
+            if (!currentLocation) return;
+
+            const distance = calculateDistance(
+                currentLocation.latitude,
+                currentLocation.longitude,
+                COLLEGE_LOCATION.latitude,
+                COLLEGE_LOCATION.longitude
+            );
+
+            document.getElementById('distanceFromCollege').textContent = `${distance.toFixed(0)} meters`;
+
+            if (distance <= COLLEGE_LOCATION.maxDistance) {
+                locationAllowed = true;
+                updateLocationStatus('✅ Location verified. You are at the college campus.', 'allowed');
+                document.getElementById('markAttendanceBtn').disabled = false;
+            } else {
+                locationAllowed = false;
+                updateLocationStatus('❌ You must be at the college campus to mark attendance.', 'denied');
+                document.getElementById('markAttendanceBtn').disabled = true;
+            }
+        }
+
+        function updateLocationStatus(message, status) {
+            const statusEl = document.getElementById('locationStatus');
+            statusEl.innerHTML = message;
+            statusEl.className = `status-indicator ${status}`;
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            const d = R * c; // in meters
+            return d;
+        }
+
+        // Camera functions
+        function startAttendanceCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    attendanceVideo = document.getElementById('attendanceVideo');
+                    attendanceVideo.srcObject = stream;
+                })
+                .catch(err => {
+                    showAlert('Camera access denied!', 'error');
+                });
+        }
+
+        function stopAttendanceCamera() {
+            if (attendanceVideo && attendanceVideo.srcObject) {
+                attendanceVideo.srcObject.getTracks().forEach(track => track.stop());
+                attendanceVideo.srcObject = null;
+            }
+        }
+
+        function markAttendance() {
+    if (!locationAllowed) {
+        showAlert('You must be at the college campus to mark attendance!', 'error');
+        return;
+    }
+
+    const facultyId = prompt("Enter Faculty ID:");
+
+    if (!facultyId) {
+        showAlert('No faculty ID provided.', 'error');
+        return;
+    }
+
+    // Capture image
+    const video = document.getElementById('attendanceVideo');
+    const canvas = document.getElementById('attendanceCanvas');
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append("faculty_id", facultyId);
+        formData.append("image", blob, "capture.jpg");
+        formData.append("location", `${currentLocation.latitude},${currentLocation.longitude}`);
+
+        fetch("/attendance/mark", {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const info = data.data || {};  // Prevent "info not defined"
+                document.getElementById('attendanceResult').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>${data.message}</strong><br>
+                        Time: ${info.time || '--'}<br>
+                        Location: ${info.location || '--'}
+                    </div>
+                `;
+            } else {
+                showAlert(data.message || "❌ Failed to mark attendance.", "error");
+            }
+        })
+        .catch(err => {
+            showAlert("❌ Error: " + err.message, "error");
+        });
+    }, 'image/jpeg');
+}
+
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            stopLocationTracking();
+            stopAttendanceCamera();
+        });
+    </script>
+</body>
+</html>

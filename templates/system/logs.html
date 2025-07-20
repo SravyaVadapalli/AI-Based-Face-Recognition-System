@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System Logs - Faculty Attendance System</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    .log-container {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 5px;
+      border-radius: 3px;
+      transition: background-color 0.2s ease;
+    }
+
+    .log-entry:hover {
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .log-timestamp {
+      color: #6c757d;
+      font-weight: bold;
+    }
+
+    .log-level {
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin: 0 8px;
+      display: inline-block;
+      min-width: 60px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .log-level.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .log-level.warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .log-level.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .log-message {
+      color: #495057;
+    }
+
+    .nav-tabs .nav-link {
+      color: #6c757d;
+      border: none;
+      border-bottom: 3px solid transparent;
+    }
+
+    .nav-tabs .nav-link.active {
+      color: #0d6efd;
+      border-bottom-color: #0d6efd;
+      font-weight: 600;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .log-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .log-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    .log-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    @media (max-width: 768px) {
+      .log-container {
+        font-size: 0.8rem;
+        max-height: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body class="p-4">
+  <div class="container">
+    <div class="back-button">
+      <a href="{{ url_for('dashboard.admin_dashboard') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back
+      </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>
+        <i class="fas fa-file-alt me-2 text-primary"></i> System Logs
+      </h2>
+      <div class="btn-group">
+        <button class="btn btn-outline-secondary" onclick="refreshLogs()">
+          <i class="fas fa-sync-alt me-1"></i>Refresh
+        </button>
+        <button class="btn btn-outline-danger" onclick="clearLogs()">
+          <i class="fas fa-trash me-1"></i>Clear Logs
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="logTabs" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#application">Application Logs</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#attendance">Attendance Logs</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#faceRecognition">Face Recognition Logs</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#error">Error Logs</button>
+      </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="application">
+        <div class="card mb-3">
+          <div class="card-header bg-primary text-white">
+            <h5><i class="fas fa-cog me-2"></i>Application Activity Logs</h5>
+          </div>
+          <div class="card-body">
+            <div class="log-container" id="applicationLogs"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="attendance">
+        <div class="card mb-3">
+          <div class="card-header bg-success text-white">
+            <h5><i class="fas fa-calendar-check me-2"></i>Attendance Logs</h5>
+          </div>
+          <div class="card-body">
+            <div class="log-container text-center py-4">
+              <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No attendance activity logged yet</p>
+              <small class="text-muted">Attendance logs will appear here when faculty attendance is marked</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="faceRecognition">
+        <div class="card mb-3">
+          <div class="card-header bg-info text-white">
+            <h5><i class="fas fa-eye me-2"></i>Face Recognition Logs</h5>
+          </div>
+          <div class="card-body">
+            <div class="log-container text-center py-4">
+              <i class="fas fa-brain fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No face recognition activity logged yet</p>
+              <small class="text-muted">AI processing logs will appear here when face recognition is performed</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="error">
+        <div class="card mb-3">
+          <div class="card-header bg-danger text-white">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Error & Warning Logs</h5>
+          </div>
+          <div class="card-body">
+            <div class="log-container text-center py-4">
+              <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+              <p class="text-success">No errors or warnings logged</p>
+              <small class="text-muted">System is running smoothly</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Stats -->
+    <div class="row mt-4">
+      <div class="col-md-3">
+        <div class="card text-center border-primary">
+          <div class="card-body">
+            <h3 class="text-primary" id="totalLogsCount">4</h3>
+            <p class="text-muted">Total Log Entries</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center border-success">
+          <div class="card-body">
+            <h3 class="text-success" id="infoLogsCount">4</h3>
+            <p class="text-muted">Info Messages</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center border-warning">
+          <div class="card-body">
+            <h3 class="text-warning" id="warningLogsCount">0</h3>
+            <p class="text-muted">Warnings</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center border-danger">
+          <div class="card-body">
+            <h3 class="text-danger" id="errorLogsCount">0</h3>
+            <p class="text-muted">Errors</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Management -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5><i class="fas fa-cogs me-2"></i>Log Management</h5>
+      </div>
+      <div class="card-body row">
+        <div class="col-md-6">
+          <h6><i class="fas fa-download text-primary me-2"></i>Export Logs</h6>
+          <p class="text-muted">Download system logs for external analysis or archiving.</p>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" onclick="exportLogs('txt')">Export as TXT</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="exportLogs('csv')">Export as CSV</button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h6><i class="fas fa-cog text-primary me-2"></i>Log Settings</h6>
+          <p class="text-muted">Configure logging levels and retention policies.</p>
+          <select class="form-select form-select-sm" id="logLevel">
+            <option value="DEBUG">DEBUG</option>
+            <option value="INFO" selected>INFO</option>
+            <option value="WARNING">WARNING</option>
+            <option value="ERROR">ERROR</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatNow() {
+      const now = new Date();
+      return now.toISOString().replace('T', ' ').substring(0, 19);
+    }
+
+    async function loadInitialLogs() {
+  const container = document.getElementById("applicationLogs");
+  container.innerHTML = "";
+
+  try {
+    const res = await fetch("/logs/get_logs");
+    const data = await res.json();
+
+    const stats = { total: 0, info: 0, warning: 0, error: 0 };
+
+    data.forEach(log => {
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      entry.innerHTML = `
+        <span class="log-timestamp">[${log.timestamp}]</span>
+        <span class="log-level ${log.level.toLowerCase()}">${log.level}</span>
+        <span class="log-message">${log.message}</span>
+      `;
+      container.appendChild(entry);
+
+      stats.total++;
+      if (log.level === "INFO") stats.info++;
+      else if (log.level === "WARNING") stats.warning++;
+      else if (log.level === "ERROR") stats.error++;
+    });
+
+    document.getElementById("totalLogsCount").textContent = stats.total;
+    document.getElementById("infoLogsCount").textContent = stats.info;
+    document.getElementById("warningLogsCount").textContent = stats.warning;
+    document.getElementById("errorLogsCount").textContent = stats.error;
+
+  } catch (err) {
+    console.error("Error fetching logs", err);
+    container.innerHTML = "<p class='text-danger'>Failed to load logs</p>";
+  }
+}
+    function refreshLogs() {
+      location.reload();
+    }
+
+    function clearLogs() {
+      if (confirm("Clear all logs?")) {
+        document.querySelectorAll(".log-container").forEach(c => c.innerHTML = `
+          <div class="text-center py-4">
+            <i class="fas fa-trash fa-2x text-muted mb-3"></i>
+            <p class="text-muted">Logs cleared successfully</p>
+          </div>
+        `);
+        document.getElementById('totalLogsCount').textContent = '0';
+        document.getElementById('infoLogsCount').textContent = '0';
+        document.getElementById('warningLogsCount').textContent = '0';
+        document.getElementById('errorLogsCount').textContent = '0';
+      }
+    }
+
+    function exportLogs(format) {
+      const entries = document.querySelectorAll(".log-entry");
+      const logs = Array.from(entries).map(entry => {
+        return {
+          timestamp: entry.querySelector(".log-timestamp").textContent,
+          level: entry.querySelector(".log-level").textContent,
+          message: entry.querySelector(".log-message").textContent
+        };
+      });
+
+      let content = "";
+      if (format === "txt") {
+        content += "Faculty Attendance System - Log Export\n";
+        content += "=====================================\n\n";
+        logs.forEach(l => content += `${l.timestamp} ${l.level}: ${l.message}\n`);
+      } else {
+        content += "Timestamp,Level,Message\n";
+        logs.forEach(l => content += `"${l.timestamp}","${l.level}","${l.message}"\n`);
+      }
+
+      const blob = new Blob([content], { type: format === "txt" ? "text/plain" : "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `system-logs.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    window.onload = loadInitialLogs;
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

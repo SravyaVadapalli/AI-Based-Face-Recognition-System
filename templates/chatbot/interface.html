@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Assistant - Faculty Attendance System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap & Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-robot me-2"></i>
+                        AI Assistant - Faculty Attendance Helper
+                    </h4>
+                    <small>Ask me anything about faculty attendance data and system management</small>
+                </div>
+
+                <div class="card-body chat-container" id="chatContainer">
+                    <div class="message bot-message">
+                        <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <p>👋 Hello! I'm your AI assistant for the Faculty Attendance System.</p>
+                                <p>I can help you with:</p>
+                                <ul class="mb-0">
+                                    <li>Faculty attendance statistics and reports</li>
+                                    <li>Individual faculty information and records</li>
+                                    <li>Department-wise attendance analysis</li>
+                                    <li>Daily, weekly, and monthly summaries</li>
+                                    <li>System usage and troubleshooting</li>
+                                </ul>
+                                <p class="mt-2 mb-0"><strong>Try asking:</strong> "How many faculty are absent today?"</p>
+                            </div>
+                            <small class="message-time">Just now</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <form id="chatForm" class="chat-input-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg" id="questionInput"
+                                   placeholder="Type your question about faculty attendance..." autocomplete="off" required>
+                            <button type="submit" class="btn btn-primary" id="sendBtn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="quick-questions mt-3">
+                        <small class="text-muted">Quick questions:</small>
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-outline-primary me-1 mb-1"
+                                    onclick="askQuickQuestion('How many faculty are present today?')">Today's Attendance</button>
+                            <button class="btn btn-sm btn-outline-primary me-1 mb-1"
+                                    onclick="askQuickQuestion('Show me department statistics')">Department Stats</button>
+                            <button class="btn btn-sm btn-outline-primary me-1 mb-1"
+                                    onclick="askQuickQuestion('Who is absent today?')">Absent Faculty</button>
+                            <button class="btn btn-sm btn-outline-primary me-1 mb-1"
+                                    onclick="askQuickQuestion('Show weekly attendance summary')">Weekly Summary</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Capabilities & Usage Tips -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-brain me-2"></i>AI Capabilities</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li><i class="fas fa-check text-success me-2"></i>Real-time data analysis</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Natural language processing</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Faculty search and lookup</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Statistical calculations</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Trend analysis</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Report generation insights</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Usage Tips</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li><i class="fas fa-arrow-right text-info me-2"></i>Ask specific questions</li>
+                                <li><i class="fas fa-arrow-right text-info me-2"></i>Use faculty names or IDs</li>
+                                <li><i class="fas fa-arrow-right text-info me-2"></i>Request date ranges</li>
+                                <li><i class="fas fa-arrow-right text-info me-2"></i>Compare departments</li>
+                                <li><i class="fas fa-arrow-right text-info me-2"></i>Request trends</li>
+                                <li><i class="fas fa-arrow-right text-info me-2"></i>Ask for help anytime</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = document.getElementById('questionInput');
+        const question = input.value.trim();
+        if (!question) return;
+
+        addMessage(question, 'user');
+        input.value = '';
+        showTypingIndicator();
+
+        fetch('/chatbot/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideTypingIndicator();
+            if (data.success) {
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage("❌ Error: " + (data.message || 'Something went wrong'), 'bot');
+            }
+        })
+        .catch(error => {
+            hideTypingIndicator();
+            addMessage("❌ Server Error: " + error.message, 'bot');
+        });
+    });
+
+    function addMessage(content, sender) {
+        const chatContainer = document.getElementById('chatContainer');
+        const messageDiv = document.createElement('div');
+        const isBot = sender === 'bot';
+        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        messageDiv.className = `message ${isBot ? 'bot-message' : 'user-message'}`;
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <i class="fas fa-${isBot ? 'robot' : 'user'}"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">${content}</div>
+                <small class="message-time">${timestamp}</small>
+            </div>
+        `;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function askQuickQuestion(question) {
+        document.getElementById('questionInput').value = question;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+
+    function showTypingIndicator() {
+        const chatContainer = document.getElementById('chatContainer');
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'message bot-message typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="message-avatar"><i class="fas fa-robot"></i></div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <div class="typing-animation">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatContainer.appendChild(typingDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('questionInput').focus();
+    });
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

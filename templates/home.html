@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Attendance System - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 900px;
+            width: 100%;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .menu-card {
+            padding: 35px 25px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-card:hover::before {
+            left: 100%;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Admin Registration - Purple/Blue gradient */
+        .menu-card.admin-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Admin Login - Green gradient */
+        .menu-card.admin-login {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        /* Faculty Registration - Orange/Red gradient */
+        .menu-card.faculty-register {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            color: white;
+        }
+
+        /* Live Attendance - Blue/Cyan gradient */
+        .menu-card.live-attendance {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .menu-card .icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .menu-card h3 {
+            margin-bottom: 12px;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-card p {
+            font-size: 0.95em;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-menu {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% extends 'base.html' %}
+
+    {% block title %}Home | Faculty Attendance System{% endblock %}
+
+    {% block content %}
+
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Faculty Attendance System</h1>
+            <p>Web Based Attendance</p>
+        </div>
+
+        <div class="main-menu">
+            <a href="{{ url_for('auth.admin_signup') }}" class="menu-card admin-register">
+
+                <div class="icon">👤</div>
+                <h3>Admin Registration</h3>
+                <p>Register new administrators</p>
+            </a>
+
+            <a href="{{ url_for('auth.login') }}" class="menu-card admin-login">
+                <div class="icon">🔐</div>
+                <h3>Admin Login</h3>
+                <p>Access admin dashboard</p>
+            </a>
+
+            <a href="{{ url_for('faculty.register') }}" class="menu-card faculty-register">
+                <div class="icon">👨‍🏫</div>
+                <h3>Faculty Registration</h3>
+                <p>Register faculty members</p>
+            </a>
+
+            <a href="{{ url_for('attendance.live_attendance') }}" class="menu-card live-attendance">
+                <div class="icon">📹</div>
+                 <h3>Live Attendance</h3>
+                <p>Real-time face recognition</p>
+                </a>
+
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faculty Attendance System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .nav-link.active {
+      background-color: #ffc107 !important;
+      color: #212529 !important;
+    }
+    .section {
+      scroll-margin-top: 80px;
+      padding-top: 40px;
+      margin-bottom: 60px;
+    }
+    .log-container {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 5px;
+      border-radius: 3px;
+      transition: background-color 0.2s ease;
+    }
+    .log-entry:hover {
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+    .log-timestamp {
+      color: #6c757d;
+      font-weight: bold;
+    }
+    .log-level {
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin: 0 8px;
+      display: inline-block;
+      min-width: 60px;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .log-level.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+      background-color: #fff;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .back-button {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body class="container py-4">
+
+  <!-- 🔙 Back to Dashboard Button -->
+  <div class="back-button">
+    <a href="admindashboard.html" class="btn btn-outline-primary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Navigation -->
+  <ul class="nav nav-pills justify-content-center mb-4 sticky-nav py-2" id="navbar">
+    <li class="nav-item">
+      <a class="nav-link active" href="#attendanceLogs"><i class="fas fa-clipboard-list me-1"></i>Attendance Logs</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#systemLogs"><i class="fas fa-file-alt me-1"></i>System Logs</a>
+    </li>
+  </ul>
+
+  <!-- Section: Attendance Logs -->
+  <div id="attendanceLogs" class="section">
+    <h3 class="text-success mb-3"><i class="fas fa-calendar-check me-2"></i>Attendance Logs</h3>
+    <div class="alert alert-success">[Attendance Filter, Table, and Stats go here]</div>
+  </div>
+
+  <!-- Section: System Logs -->
+  <div id="systemLogs" class="section">
+    <h3 class="text-info mb-3"><i class="fas fa-file-alt me-2"></i>System Logs</h3>
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <i class="fas fa-cogs me-2"></i>Application Activity Logs
+      </div>
+      <div class="card-body">
+        <div class="log-container" id="applicationLogs"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function formatNow() {
+      const now = new Date();
+      return now.toISOString().replace('T', ' ').substring(0, 19);
+    }
+
+    function loadInitialLogs() {
+      const logs = [
+        "Faculty Attendance System started successfully",
+        "Database connection established",
+        "Admin user 'admin' logged in successfully",
+        "Blueprint modules loaded: auth, faculty, attendance, dashboard, reports, chatbot, alerts"
+      ];
+      const container = document.getElementById("applicationLogs");
+      logs.forEach(msg => {
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.innerHTML = `
+          <span class="log-timestamp">[${formatNow()}]</span>
+          <span class="log-level info">INFO</span>
+          <span class="log-message">${msg}</span>
+        `;
+        container.appendChild(entry);
+      });
+    }
+
+    // Highlight active nav tab when clicked
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function () {
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Active section highlight while scrolling
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.section');
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (pageYOffset >= sectionTop) {
+          current = section.getAttribute('id');
+        }
+      });
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    window.onload = loadInitialLogs;
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

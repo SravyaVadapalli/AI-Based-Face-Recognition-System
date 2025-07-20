@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Attendance System - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .nav-buttons {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 1000;
+        }
+
+        .nav-buttons a {
+            background: #ffffffdd;
+            color: #333;
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, transform 0.2s;
+        }
+
+        .nav-buttons a:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1200px;
+            width: 100%;
+            margin: 20px;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .menu-card {
+            padding: 35px 25px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-card:hover::before {
+            left: 100%;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .menu-card.admin-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .menu-card.admin-login {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .menu-card.faculty-register {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            color: white;
+        }
+
+        .menu-card.live-attendance {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .menu-card .icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .menu-card h3 {
+            margin-bottom: 12px;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-card p {
+            font-size: 0.95em;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-assistant {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        .ai-assistant .icon {
+            font-size: 2.5em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .ai-assistant {
+                width: 60px;
+                height: 60px;
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .ai-assistant .icon {
+                font-size: 2em;
+            }
+
+            .nav-buttons a {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top-level nav buttons (background-level) -->
+    <div class="nav-buttons">
+        <a href="{{ url_for('main_bp.home') }}">← Back</a>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Admin Dashboard</h1>
+            <p>Web Based Attendance</p>
+        </div>
+
+        <div class="main-menu">
+            <a href="{{url_for('alerts.history')}}" class="menu-card admin-register">
+                <div class="icon">📲</div> 
+                <h3>Alerts</h3>
+                <p>View and send alert messages</p>
+            </a>
+
+            <a href="{{url_for('dashboard.show_logs')}}" class="menu-card faculty-register">
+                <div class="icon">📋</div>
+                <h3>Logs</h3>
+                <p>View attendance and system logs</p>
+            </a>
+
+            <a href="{{ url_for('faculty.manage_faculty') }}" class="menu-card admin-register">
+                <div class="icon">➕</div>
+                <h3>Add & Update Faculty</h3>
+                <p>Add new faculty and modify existing faculty info</p>
+            </a>
+
+            <a href="{{url_for('reports.reports_home')}}" class="menu-card faculty-register">
+                <div class="icon">📊</div>
+                <h3>Reports</h3>
+                <p>Generate and download reports</p>
+            </a>
+        </div>
+
+        <!-- AI Assistant -->
+        <a href="{{ url_for('chatbot.interface') }}" class="ai-assistant">
+            <div class="icon">🤖</div>
+        </a>
+    </div>
+</body>
+</html>

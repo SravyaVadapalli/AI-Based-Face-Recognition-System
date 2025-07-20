@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Export Reports - Faculty Attendance System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .form-check {
+      padding: 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-check:hover {
+      border-color: #0d6efd;
+      background-color: #f8f9fa;
+    }
+
+    .form-check-input:checked + .form-check-label {
+      color: #0d6efd;
+    }
+
+    .statistic-item {
+      padding: 1rem;
+    }
+
+    .statistic-item h4 {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    code {
+      color: #e83e8c;
+      background-color: transparent;
+    }
+
+    .bg-light code {
+      color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+      .form-check {
+        margin-bottom: 0.5rem;
+        padding: 0.75rem;
+      }
+
+      .statistic-item h4 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+
+    <div class="back-button">
+      <a href="{{ url_for('dashboard.admin_dashboard') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back
+      </a>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="card shadow">
+          <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="fas fa-file-export me-2"></i>Export Attendance Reports</h4>
+          </div>
+          <div class="card-body">
+            <form id="exportForm">
+              <!-- Report Type -->
+              <div class="mb-4">
+                <label class="form-label fw-bold"><i class="fas fa-chart-bar me-2"></i>Report Type</label>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="report_type" id="daily_report" value="daily" checked>
+                      <label class="form-check-label" for="daily_report">
+                        <i class="fas fa-calendar-day me-1"></i><strong>Daily Report</strong><br>
+                        <small class="text-muted">Single day attendance data</small>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="report_type" id="weekly_report" value="weekly">
+                      <label class="form-check-label" for="weekly_report">
+                        <i class="fas fa-calendar-week me-1"></i><strong>Weekly Report</strong><br>
+                        <small class="text-muted">7-day attendance summary</small>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="report_type" id="monthly_report" value="monthly">
+                      <label class="form-check-label" for="monthly_report">
+                        <i class="fas fa-calendar-alt me-1"></i><strong>Monthly Report</strong><br>
+                        <small class="text-muted">Full month attendance data</small>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Format Selection -->
+              <div class="mb-4">
+                <label class="form-label fw-bold"><i class="fas fa-file me-2"></i>Export Format</label>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format_type" id="csv_format" value="csv" checked>
+                      <label class="form-check-label" for="csv_format">
+                        <i class="fas fa-file-csv me-1 text-success"></i><strong>CSV Format</strong><br>
+                        <small class="text-muted">Excel compatible, easy to analyze</small>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format_type" id="pdf_format" value="pdf">
+                      <label class="form-check-label" for="pdf_format">
+                        <i class="fas fa-file-pdf me-1 text-danger"></i><strong>PDF Format</strong><br>
+                        <small class="text-muted">Professional reports, print-ready</small>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Date Range -->
+              <div class="mb-4">
+                <label class="form-label fw-bold"><i class="fas fa-calendar-alt me-2"></i>Date Range</label>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="date_from" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="date_to" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to">
+                  </div>
+                </div>
+                <small class="form-text text-muted"><i class="fas fa-info-circle me-1"></i>Leave empty to include all available data</small>
+              </div>
+
+              <!-- Filters -->
+              <div class="mb-4">
+                <label class="form-label fw-bold"><i class="fas fa-filter me-2"></i>Additional Filters</label>
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="faculty_filter" class="form-label">Specific Faculty</label>
+                    <select class="form-select" id="faculty_filter" name="faculty_filter">
+                      <option value="">All Faculty Members</option>
+                      <option value="FAC001">John Smith (FAC001)</option>
+                      <option value="FAC002">Jane Doe (FAC002)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="department_filter" class="form-label">Department</label>
+                    <select class="form-select" id="department_filter" name="department_filter">
+                      <option value="">All Departments</option>
+                      <option value="Computer Science">Computer Science</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="Biology">Biology</option>
+                      <option value="English">English</option>
+                      <option value="History">History</option>
+                      <option value="Economics">Economics</option>
+                      <option value="Psychology">Psychology</option>
+                      <option value="Engineering">Engineering</option>
+                      <option value="Business Administration">Business Administration</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generate Button -->
+              <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="button" class="btn btn-secondary me-md-2" onclick="resetForm()">
+                  <i class="fas fa-redo me-1"></i>Reset
+                </button>
+                <button type="submit" class="btn btn-info" id="generateBtn">
+                  <i class="fas fa-download me-1"></i>Generate & Download Report
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- CSV Sample -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h5><i class="fas fa-file-csv text-success me-2"></i>CSV Report Sample</h5>
+          </div>
+          <div class="card-body">
+            <div class="bg-light p-3 rounded">
+              <code style="font-size: 0.8rem;">
+                Faculty ID,Faculty Name,Department,Email,Date,Time,Status,Location<br>
+                FAC001,John Smith,Computer Science,john@example.com,2024-01-15,09:30:00,Present,Main Building<br>
+                FAC002,Jane Doe,Mathematics,jane@example.com,2024-01-15,09:45:00,Present,Science Block
+              </code>
+            </div>
+          </div>
+        </div>
+
+        <!-- PDF Sample -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h5><i class="fas fa-file-pdf text-danger me-2"></i>PDF Report Sample</h5>
+          </div>
+          <div class="card-body text-center">
+            <i class="fas fa-file-pdf fa-4x text-danger mb-3"></i>
+            <h6>Faculty Attendance Report</h6>
+            <p class="text-muted">Professional formatted report with headers, tables, and statistics</p>
+          </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h5><i class="fas fa-chart-line me-2"></i>Export Usage Statistics</h5>
+          </div>
+          <div class="card-body row text-center">
+            <div class="col-md-3">
+              <h4 class="text-primary">0</h4><p>Reports Generated</p>
+            </div>
+            <div class="col-md-3">
+              <h4 class="text-success">0</h4><p>CSV Downloads</p>
+            </div>
+            <div class="col-md-3">
+              <h4 class="text-danger">0</h4><p>PDF Downloads</p>
+            </div>
+            <div class="col-md-3">
+              <h4 class="text-info">0</h4><p>Records Exported</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="card mt-4 mb-5">
+          <div class="card-header">
+            <h5><i class="fas fa-question-circle me-2"></i>Export Help & Tips</h5>
+          </div>
+          <div class="card-body row">
+            <div class="col-md-6">
+              <h6><i class="fas fa-lightbulb text-warning me-2"></i>Best Practices</h6>
+              <ul>
+                <li>Use CSV for data analysis</li>
+                <li>Use PDF for presentations</li>
+                <li>Filter by date for performance</li>
+                <li>Export regularly for backups</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6><i class="fas fa-cog text-primary me-2"></i>System Information</h6>
+              <ul>
+                <li>Reports are stored in the cloud</li>
+                <li>Data is up-to-date</li>
+                <li>Time zone: Local</li>
+                <li>Export history is tracked</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const today = new Date();
+      const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      document.getElementById('date_from').value = oneWeekAgo.toISOString().split('T')[0];
+      document.getElementById('date_to').value = today.toISOString().split('T')[0];
+
+      document.querySelectorAll('input[name="report_type"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          const now = new Date();
+          let fromDate = new Date();
+          if (radio.value === 'weekly') fromDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          else if (radio.value === 'monthly') fromDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+          document.getElementById('date_from').value = fromDate.toISOString().split('T')[0];
+          document.getElementById('date_to').value = now.toISOString().split('T')[0];
+        });
+      });
+
+      document.getElementById('exportForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const btn = document.getElementById('generateBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating Report...';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fas fa-download me-1"></i>Generate & Download Report';
+          btn.disabled = false;
+        }, 3000);
+        alert("Report generation simulated.");
+      });
+    });
+
+    function resetForm() {
+      document.getElementById('exportForm').reset();
+      document.getElementById('daily_report').checked = true;
+      document.getElementById('csv_format').checked = true;
+
+      const today = new Date();
+      const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      document.getElementById('date_from').value = oneWeekAgo.toISOString().split('T')[0];
+      document.getElementById('date_to').value = today.toISOString().split('T')[0];
+    }
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Faculty List - Faculty Attendance System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    .empty-state {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .faculty-avatar img {
+      border: 2px solid #e9ecef;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+
+    .btn-group .btn {
+      margin-right: 2px;
+    }
+
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+
+    @media (max-width: 768px) {
+      .table-responsive {
+        font-size: 0.875rem;
+      }
+
+      .faculty-avatar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users me-2 text-primary"></i>Faculty Members</h2>
+    <a href="register.html" class="btn btn-primary">
+      <i class="fas fa-user-plus me-1"></i>Add New Faculty
+    </a>
+  </div>
+
+  <!-- Example Table: Replace with dynamic content or backend-generated HTML -->
+  <div class="card shadow">
+    <div class="card-header bg-light">
+      <div class="row align-items-center">
+        <div class="col">
+          <h5 class="mb-0"><i class="fas fa-list me-2"></i>Total Faculty: 3</h5>
+        </div>
+        <div class="col-auto">
+          <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search faculty...">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0" id="facultyTable">
+          <thead class="table-primary">
+            <tr>
+              <th scope="col"><i class="fas fa-user me-1"></i>Faculty</th>
+              <th scope="col"><i class="fas fa-user me-1"></i>ID</th>
+              <th scope="col"><i class="fas fa-user me-1"></i>Department</th>
+              <th scope="col"><i class="fas fa-user me-1"></i>Email</th>
+              <th scope="col"><i class="fas fa-user me-1"></i>Phone</th>
+              <th scope="col"><i class="fas fa-user me-1"></i>Registered</th>
+              <th scope="col"><i class="fas fa-user me-1"></i>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Replace below rows with data dynamically -->
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="faculty-avatar me-3">
+                    <img src="https://via.placeholder.com/50" alt="John Doe" class="rounded-circle" width="50" height="50">
+                  </div>
+                  <div>
+                    <strong>John Doe</strong><br>
+                    <small class="text-muted">FAC123</small>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge bg-secondary">FAC123</span></td>
+              <td><span class="badge bg-info">Computer Science</span></td>
+              <td><a href="mailto:john@example.com">john@example.com</a></td>
+              <td><a href="tel:+1234567890">+1234567890</a></td>
+              <td><small class="text-muted">2024-11-15</small></td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="edit.html" class="btn btn-sm btn-outline-primary" title="Edit">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('FAC123', 'John Doe')" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- More faculty rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Statistics -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-chart-pie me-2"></i>Department Distribution</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="card border-primary">
+                <div class="card-body text-center">
+                  <h5 class="card-title text-primary">2</h5>
+                  <p class="card-text">Computer Science</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="card border-primary">
+                <div class="card-body text-center">
+                  <h5 class="card-title text-primary">1</h5>
+                  <p class="card-text">Mathematics</p>
+                </div>
+              </div>
+            </div>
+            <!-- More departments -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong id="facultyNameToDelete"></strong>?</p>
+          <p class="text-danger"><i class="fas fa-warning me-1"></i>This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="#" id="confirmDeleteBtn" class="btn btn-danger">
+            <i class="fas fa-trash me-1"></i>Delete Faculty
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Search
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+      const searchTerm = this.value.toLowerCase();
+      const tableRows = document.querySelectorAll('#facultyTable tbody tr');
+
+      tableRows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    });
+
+    // Delete confirmation
+    function confirmDelete(facultyId, facultyName) {
+      document.getElementById('facultyNameToDelete').textContent = facultyName;
+      document.getElementById('confirmDeleteBtn').href = `delete.html?id=${facultyId}`;
+      const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+      modal.show();
+    }
+
+    // Auto-refresh simulation
+    setInterval(() => {
+      console.log('Auto-refreshing faculty data...');
+    }, 30000);
+  </script>
+</body>
+</html>
